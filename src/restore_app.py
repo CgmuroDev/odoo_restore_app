@@ -530,7 +530,7 @@ class MainWindow(QMainWindow):
         form.addRow(self._chk_drop)
 
         self._chk_neutralize = QCheckBox(
-            "Neutralizar BD (estilo Odoo; requiere rutas de addons)"
+            "Neutralizar base de datos"
         )
         self._chk_neutralize.setChecked(True)
         self._chk_neutralize.toggled.connect(self._on_neutralize_toggled)
