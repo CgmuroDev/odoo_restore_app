@@ -509,18 +509,35 @@ class MainWindow(QMainWindow):
         self._chk_neutralize.toggled.connect(self._on_neutralize_toggled)
         form.addRow(self._chk_neutralize)
 
-        addon_row = QHBoxLayout()
-        self._addon_paths = QLineEdit()
-        self._addon_paths.setPlaceholderText(
-            "/ruta/a/odoo-17.0, /ruta/a/odoo/addons, /ruta/a/enterprise"
+        addon_row_1 = QHBoxLayout()
+        self._addon_path_1 = QLineEdit()
+        self._addon_path_1.setPlaceholderText(
+            "Ejemplo: /home/xxxx/Trabajo/repos/odoo-12.0/addons"
         )
-        self._addon_paths.setEnabled(True)
-        self._btn_browse_addons = QPushButton("Explorar...")
-        self._btn_browse_addons.setEnabled(True)
-        self._btn_browse_addons.clicked.connect(self._browse_addon_path)
-        addon_row.addWidget(self._addon_paths, 1)
-        addon_row.addWidget(self._btn_browse_addons)
-        form.addRow("Rutas fuentes:", addon_row)
+        self._addon_path_1.setEnabled(True)
+        self._btn_browse_addons_1 = QPushButton("Explorar...")
+        self._btn_browse_addons_1.setEnabled(True)
+        self._btn_browse_addons_1.clicked.connect(
+            lambda: self._browse_addon_path(self._addon_path_1)
+        )
+        addon_row_1.addWidget(self._addon_path_1, 1)
+        addon_row_1.addWidget(self._btn_browse_addons_1)
+        form.addRow("Ruta fuente 1:", addon_row_1)
+
+        addon_row_2 = QHBoxLayout()
+        self._addon_path_2 = QLineEdit()
+        self._addon_path_2.setPlaceholderText(
+            "Ejemplo: /home/xxxx/Trabajo/repos/odoo-12.0/odoo/addons"
+        )
+        self._addon_path_2.setEnabled(True)
+        self._btn_browse_addons_2 = QPushButton("Explorar...")
+        self._btn_browse_addons_2.setEnabled(True)
+        self._btn_browse_addons_2.clicked.connect(
+            lambda: self._browse_addon_path(self._addon_path_2)
+        )
+        addon_row_2.addWidget(self._addon_path_2, 1)
+        addon_row_2.addWidget(self._btn_browse_addons_2)
+        form.addRow("Ruta fuente 2:", addon_row_2)
 
         fs_row = QHBoxLayout()
         default_fs = os.path.join(
@@ -614,19 +631,30 @@ class MainWindow(QMainWindow):
         self._fs_browse_btn.setEnabled(checked)
 
     def _on_neutralize_toggled(self, checked: bool) -> None:
-        self._addon_paths.setEnabled(checked)
-        self._btn_browse_addons.setEnabled(checked)
+        self._addon_path_1.setEnabled(checked)
+        self._btn_browse_addons_1.setEnabled(checked)
+        self._addon_path_2.setEnabled(checked)
+        self._btn_browse_addons_2.setEnabled(checked)
 
-    def _browse_addon_path(self) -> None:
+    def _expand_source_paths(self, path: str) -> list[str]:
+        normalized = os.path.abspath(path)
+        candidates = [
+            normalized,
+            os.path.join(normalized, "addons"),
+            os.path.join(normalized, "odoo", "addons"),
+        ]
+        expanded = []
+        for candidate in candidates:
+            if os.path.isdir(candidate) and candidate not in expanded:
+                expanded.append(candidate)
+        return expanded or [normalized]
+
+    def _browse_addon_path(self, target: QLineEdit) -> None:
         path = QFileDialog.getExistingDirectory(
-            self, "Seleccionar directorio de addons"
+            self, "Seleccionar ruta fuente de Odoo"
         )
         if path:
-            current = self._addon_paths.text().strip()
-            if current:
-                self._addon_paths.setText(f"{current}, {path}")
-            else:
-                self._addon_paths.setText(path)
+            target.setText(path)
 
     def _browse_backup_dir(self) -> None:
         path = QFileDialog.getExistingDirectory(self, "Seleccionar directorio de backup")
@@ -651,12 +679,16 @@ class MainWindow(QMainWindow):
             self._backup_dir.setFocus()
             return
 
-        addon_paths_text = self._addon_paths.text().strip()
-        addon_paths = (
-            [p.strip() for p in addon_paths_text.split(",") if p.strip()]
-            if addon_paths_text
-            else []
-        )
+        addon_paths = []
+        for source_path in (
+            self._addon_path_1.text().strip(),
+            self._addon_path_2.text().strip(),
+        ):
+            if not source_path:
+                continue
+            for candidate in self._expand_source_paths(source_path):
+                if candidate not in addon_paths:
+                    addon_paths.append(candidate)
 
         if self._chk_neutralize.isChecked() and not addon_paths:
             QMessageBox.warning(
@@ -664,7 +696,7 @@ class MainWindow(QMainWindow):
                 "Campo requerido",
                 "Para neutralizar como Odoo, ingresa al menos una ruta fuente.",
             )
-            self._addon_paths.setFocus()
+            self._addon_path_1.setFocus()
             return
 
         self._log_area.clear()
