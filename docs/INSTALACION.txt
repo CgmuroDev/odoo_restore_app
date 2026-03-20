@@ -21,7 +21,30 @@ Para actualizaciones automaticas, asegurate de tener instalado
 policykit-1.
 
 
-OPCION 2 - Generar el .deb tu mismo
+OPCION 2 - Publicar en Ubuntu App Center con Snap
+--------------------------------------------------
+Para aparecer en la tienda de Ubuntu debes publicar un snap.
+
+Desde la raiz del proyecto:
+
+  snapcraft
+
+Eso genera un archivo .snap. Para probarlo localmente:
+
+  sudo snap install --dangerous odoo-restore_*.snap
+
+Para publicarlo:
+
+  snapcraft login
+  snapcraft register odoo-restore
+  snapcraft upload --release=stable odoo-restore_*.snap
+
+El descriptor del snap esta en:
+
+  snap/snapcraft.yaml
+
+
+OPCION 3 - Generar el .deb tu mismo
 -------------------------------------
 Desde la raiz del proyecto ejecuta:
 
@@ -31,7 +54,7 @@ Esto genera el archivo dist/odoo-restore_<VERSION>_all.deb
 Luego instalalo con la opcion 1.
 
 
-OPCION 3 - Correr directamente con Python
+OPCION 4 - Correr directamente con Python
 ------------------------------------------
   sudo apt install python3 python3-pyqt6 postgresql-client rsync
   python3 src/main.py

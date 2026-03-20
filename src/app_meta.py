@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 
@@ -39,6 +40,10 @@ def resolve_icon_file() -> Path:
 
 def load_version() -> str:
     return VERSION_FILE.read_text(encoding="utf-8").strip()
+
+
+def is_snap_runtime() -> bool:
+    return bool(os.environ.get("SNAP"))
 
 
 APP_VERSION = load_version()

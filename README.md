@@ -12,6 +12,7 @@ La herramienta permite:
 - copiar el `filestore`
 - neutralizar la base al estilo Odoo usando archivos `data/neutralize.sql`
 - avisar cuando hay una nueva release publicada en GitHub
+- empaquetarse como snap para Ubuntu App Center
 - guardar un historial local de restauraciones
 
 ## Requisitos
@@ -125,6 +126,7 @@ Comportamiento:
 - al iniciar la app hace una verificacion silenciosa
 - si hay una version nueva para Linux, la app puede descargarla, instalar el `.deb` y reiniciarse
 - si hay una version nueva para macOS, la app descarga el `.zip` y deja la actualizacion preparada
+- si la app corre dentro de un snap, el updater interno se desactiva y las actualizaciones las gestiona `snapd`
 
 Artefactos esperados por plataforma:
 
@@ -150,6 +152,30 @@ sudo apt install -f
 
 Para actualizaciones automaticas en Linux, el sistema debe tener `policykit-1` disponible.
 
+### Ubuntu App Center: paquete `snap`
+
+Build local del snap:
+
+```bash
+snapcraft
+```
+
+Instalacion local para prueba:
+
+```bash
+sudo snap install --dangerous odoo-restore_*.snap
+```
+
+Publicacion en Snap Store:
+
+```bash
+snapcraft login
+snapcraft register odoo-restore
+snapcraft upload --release=stable odoo-restore_*.snap
+```
+
+El descriptor del snap vive en `snap/snapcraft.yaml`.
+
 ### Windows / macOS / Linux: ejecutable con PyInstaller
 
 ```bash
@@ -170,6 +196,7 @@ Salidas esperadas:
 3. El workflow de GitHub Actions genera y sube:
    - `odoo-restore_<VERSION>_all.deb`
    - `OdooRestore-macOS-<VERSION>.zip`
+4. Para Ubuntu App Center, construye y publica ademas el snap en Snap Store.
 
 ## Archivos principales
 
@@ -179,6 +206,7 @@ Salidas esperadas:
 - `src/restore_app.py`: UI y logica de restauracion
 - `dist/build_deb.sh`: construccion del paquete Debian
 - `dist/build_app.py`: construccion con PyInstaller
+- `snap/snapcraft.yaml`: empaquetado Snap para Ubuntu App Center
 - `docs/INSTALACION.txt`: notas de instalacion rapida
 
 ## Notas

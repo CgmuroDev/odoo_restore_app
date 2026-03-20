@@ -33,7 +33,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from app_meta import APP_ICON_FILE, APP_VERSION
+from app_meta import APP_ICON_FILE, APP_VERSION, is_snap_runtime
 from update_service import (
     AppliedUpdate,
     apply_update,
@@ -495,7 +495,8 @@ class MainWindow(QMainWindow):
 
         self._build_ui()
         self._refresh_history()
-        QTimer.singleShot(1200, self._check_updates_on_startup)
+        if not is_snap_runtime():
+            QTimer.singleShot(1200, self._check_updates_on_startup)
 
     def _build_ui(self) -> None:
         self._tabs.addTab(self._build_restore_tab(), "Restaurar")
