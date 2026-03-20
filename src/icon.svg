@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="#714B67"/>
+  <!-- Database cylinder body -->
+  <rect x="32" y="45" width="64" height="40" rx="2" fill="#ffffff"/>
+  <!-- Database cylinder top ellipse -->
+  <ellipse cx="64" cy="45" rx="32" ry="12" fill="#f0f0f0" stroke="#ffffff" stroke-width="1"/>
+  <!-- Database cylinder bottom ellipse -->
+  <ellipse cx="64" cy="85" rx="32" ry="12" fill="#e8e8e8"/>
+  <!-- Database lines -->
+  <line x1="32" y1="58" x2="96" y2="58" stroke="#714B67" stroke-width="1.5" opacity="0.3"/>
+  <line x1="32" y1="72" x2="96" y2="72" stroke="#714B67" stroke-width="1.5" opacity="0.3"/>
+  <!-- Restore arrow -->
+  <g transform="translate(64,62)">
+    <path d="M12,-8 A14,14 0 1,0 12,8" fill="none" stroke="#714B67" stroke-width="3.5" stroke-linecap="round"/>
+    <polygon points="12,8 18,4 14,12" fill="#714B67"/>
+  </g>
+</svg>

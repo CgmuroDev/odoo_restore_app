@@ -1,0 +1,102 @@
+================================================================
+        RESTAURAR BACKUP ODOO - Guia de Instalacion
+================================================================
+
+Herramienta grafica para restaurar bases de datos Odoo desde
+respaldos que contengan dump.sql y filestore/.
+
+================================================================
+                        UBUNTU / LINUX
+================================================================
+
+OPCION 1 - Instalar el paquete .deb (recomendado)
+--------------------------------------------------
+Si ya tienes el archivo .deb listo, solo instalalo:
+
+  sudo dpkg -i dist/odoo-restore_1.0.0_all.deb
+  sudo apt install -f        # por si faltan dependencias
+
+Abre el menu de aplicaciones y busca "Restaurar Backup Odoo".
+
+
+OPCION 2 - Generar el .deb tu mismo
+-------------------------------------
+Desde la raiz del proyecto ejecuta:
+
+  bash dist/build_deb.sh
+
+Esto genera el archivo dist/odoo-restore_1.0.0_all.deb
+Luego instalalo con la opcion 1.
+
+
+OPCION 3 - Correr directamente con Python
+------------------------------------------
+  sudo apt install python3 python3-pyqt6 postgresql-client rsync
+  python3 src/main.py
+
+
+================================================================
+                          WINDOWS
+================================================================
+
+OPCION 1 - Generar ejecutable .exe (recomendado)
+-------------------------------------------------
+El .exe no requiere que tu amigo tenga Python instalado.
+
+1. Instalar Python 3.10+:
+      https://www.python.org/downloads/
+      IMPORTANTE: marcar "Add Python to PATH"
+
+2. Instalar PostgreSQL (incluye psql.exe):
+      https://www.postgresql.org/download/windows/
+
+3. Abrir CMD o PowerShell en la carpeta del proyecto:
+      pip install PyQt6 pyinstaller
+      python dist/build_app.py
+
+4. El ejecutable estara en:
+      dist/OdooRestore.exe
+
+Comparte ese archivo .exe con tu amigo.
+
+
+OPCION 2 - Correr directamente con Python
+------------------------------------------
+1. Instalar Python 3.10+ (marcar "Add Python to PATH")
+2. Instalar PostgreSQL
+3. En CMD o PowerShell:
+      pip install PyQt6
+      python src/main.py
+
+
+================================================================
+                            MAC
+================================================================
+
+OPCION 1 - Generar aplicacion .app (recomendado)
+-------------------------------------------------
+La .app no requiere que tu amigo tenga Python instalado.
+
+1. Instalar Python 3.10+:
+      https://www.python.org/downloads/macos/
+
+2. Instalar PostgreSQL:
+      brew install postgresql
+      (requiere Homebrew: https://brew.sh)
+
+3. Abrir Terminal en la carpeta del proyecto:
+      pip3 install PyQt6 pyinstaller
+      python3 dist/build_app.py
+
+4. La aplicacion estara en:
+      dist/OdooRestore.app
+
+
+OPCION 2 - Correr directamente con Python
+------------------------------------------
+1. Instalar Python 3.10+ y PostgreSQL (ver opcion 1)
+2. En Terminal:
+      pip3 install PyQt6
+      python3 src/main.py
+
+
