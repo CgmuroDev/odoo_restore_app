@@ -21,9 +21,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent / "src"
+PROJECT_ROOT = Path(__file__).parent.parent
 ICON = ROOT / "icon.svg"
 MAIN = ROOT / "main.py"
 APP_NAME = "OdooRestore"
+APP_VERSION = (PROJECT_ROOT / "VERSION").read_text(encoding="utf-8").strip()
 
 
 def check_pyinstaller() -> None:
@@ -61,12 +63,26 @@ def build() -> None:
 
     subprocess.check_call(cmd)
 
+    if system == "Darwin":
+        zip_name = f"{APP_NAME}-macOS-{APP_VERSION}.zip"
+        app_bundle = Path("dist") / f"{APP_NAME}.app"
+        subprocess.check_call([
+            "ditto",
+            "-c",
+            "-k",
+            "--sequesterRsrc",
+            "--keepParent",
+            str(app_bundle),
+            str(Path("dist") / zip_name),
+        ])
+
     print()
     print(f"Ejecutable generado en: dist/{APP_NAME}")
     if system == "Windows":
         print(f"  -> dist/{APP_NAME}.exe")
     elif system == "Darwin":
         print(f"  -> dist/{APP_NAME}.app")
+        print(f"  -> dist/{APP_NAME}-macOS-{APP_VERSION}.zip")
 
 
 if __name__ == "__main__":

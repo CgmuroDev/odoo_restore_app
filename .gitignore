@@ -5,6 +5,7 @@ __pycache__/
 *.py[cod]
 build/
 dist/*.deb
+dist/*.zip
 dist/OdooRestore
 dist/OdooRestore.app/
 dist/OdooRestore.exe

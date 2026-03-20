@@ -13,7 +13,7 @@ OPCION 1 - Instalar el paquete .deb (recomendado)
 --------------------------------------------------
 Si ya tienes el archivo .deb listo, solo instalalo:
 
-  sudo dpkg -i dist/odoo-restore_1.0.0_all.deb
+  sudo dpkg -i dist/odoo-restore_<VERSION>_all.deb
   sudo apt install -f        # por si faltan dependencias
 
 Abre el menu de aplicaciones y busca "Restaurar Backup Odoo".
@@ -25,7 +25,7 @@ Desde la raiz del proyecto ejecuta:
 
   bash dist/build_deb.sh
 
-Esto genera el archivo dist/odoo-restore_1.0.0_all.deb
+Esto genera el archivo dist/odoo-restore_<VERSION>_all.deb
 Luego instalalo con la opcion 1.
 
 
@@ -98,5 +98,4 @@ OPCION 2 - Correr directamente con Python
 2. En Terminal:
       pip3 install PyQt6
       python3 src/main.py
-
 

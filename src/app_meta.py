@@ -1,0 +1,33 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+
+APP_SLUG = "odoo-restore"
+APP_DISPLAY_NAME = "OdooRestore"
+GITHUB_REPO = "CgmuroDev/odoo_restore_app"
+GITHUB_RELEASES_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+GITHUB_RELEASES_PAGE = f"https://github.com/{GITHUB_REPO}/releases/latest"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+MODULE_DIR = Path(__file__).resolve().parent
+
+
+def _resolve_version_file() -> Path:
+    candidates = [
+        MODULE_DIR / "VERSION",
+        ROOT_DIR / "VERSION",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
+VERSION_FILE = _resolve_version_file()
+
+
+def load_version() -> str:
+    return VERSION_FILE.read_text(encoding="utf-8").strip()
+
+
+APP_VERSION = load_version()

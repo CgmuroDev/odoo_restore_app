@@ -11,6 +11,7 @@ La herramienta permite:
 - reemplazar una base existente
 - copiar el `filestore`
 - neutralizar la base al estilo Odoo usando archivos `data/neutralize.sql`
+- avisar cuando hay una nueva release publicada en GitHub
 - guardar un historial local de restauraciones
 
 ## Requisitos
@@ -88,8 +89,8 @@ Para que esto funcione, debes indicar rutas fuente donde existan los modulos ins
 Ejemplos de rutas:
 
 ```text
-/home/soltein/Trabajo/repos/odoo-17.0
-/home/soltein/Trabajo/repos/enterprise
+/home/xxxx/Trabajo/repos/odoo-12.0/addons
+/home/xxxx/Trabajo/repos/odoo-12.0/odoo/addons
 /opt/odoo/custom-addons
 ```
 
@@ -103,13 +104,32 @@ Campos principales:
 - `Directorio backup`: carpeta que contiene `dump.sql`
 - `Host`, `Puerto`, `Usuario`, `Password`: conexion a PostgreSQL
 - `Filestore root`: carpeta base donde se copiara el filestore
-- `Rutas fuentes`: rutas separadas por coma para buscar `neutralize.sql`
+- `Ruta fuente 1` y `Ruta fuente 2`: rutas usadas para buscar `neutralize.sql`
 
 Opciones:
 
 - `Copiar filestore`
 - `Eliminar BD si ya existe`
 - `Neutralizar BD (estilo Odoo; requiere rutas de addons)`
+
+## Actualizaciones
+
+La app consulta la ultima **GitHub Release estable** publicada en:
+
+```text
+https://github.com/CgmuroDev/odoo_restore_app
+```
+
+Comportamiento:
+
+- al iniciar la app hace una verificacion silenciosa
+- en `Ayuda > Buscar actualizaciones` puedes forzar una revision manual
+- si hay una version nueva para tu plataforma, la app ofrece abrir la descarga correcta
+
+Artefactos esperados por plataforma:
+
+- Linux: `odoo-restore_<VERSION>_all.deb`
+- macOS: `OdooRestore-macOS-<VERSION>.zip`
 
 ## Empaquetado
 
@@ -124,7 +144,7 @@ bash dist/build_deb.sh
 Instalar:
 
 ```bash
-sudo dpkg -i dist/odoo-restore_1.0.0_all.deb
+sudo dpkg -i dist/odoo-restore_<VERSION>_all.deb
 sudo apt install -f
 ```
 
@@ -138,12 +158,22 @@ python dist/build_app.py
 Salidas esperadas:
 
 - Windows: `dist/OdooRestore.exe`
-- macOS: `dist/OdooRestore.app`
+- macOS: `dist/OdooRestore.app` y `dist/OdooRestore-macOS-<VERSION>.zip`
 - Linux: `dist/OdooRestore`
+
+## Publicar una release
+
+1. Actualiza el archivo `VERSION`.
+2. Publica una release estable con tag `vX.Y.Z` en GitHub.
+3. El workflow de GitHub Actions genera y sube:
+   - `odoo-restore_<VERSION>_all.deb`
+   - `OdooRestore-macOS-<VERSION>.zip`
 
 ## Archivos principales
 
 - `src/main.py`: punto de entrada
+- `src/app_meta.py`: metadata compartida de version y repo
+- `src/update_service.py`: chequeo y parseo de releases
 - `src/restore_app.py`: UI y logica de restauracion
 - `dist/build_deb.sh`: construccion del paquete Debian
 - `dist/build_app.py`: construccion con PyInstaller
@@ -154,3 +184,4 @@ Salidas esperadas:
 - El historial se guarda en `~/.local/share/bd_restaurater/history.json`.
 - La app depende de `psql` y `rsync`; si no estan instalados, la restauracion falla.
 - La neutralizacion depende de tener acceso al codigo fuente de los modulos instalados.
+- En esta version, macOS se distribuye sin firma ni notarizacion.

@@ -1,18 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
-  <!-- Background circle -->
-  <circle cx="64" cy="64" r="60" fill="#714B67"/>
-  <!-- Database cylinder body -->
-  <rect x="32" y="45" width="64" height="40" rx="2" fill="#ffffff"/>
-  <!-- Database cylinder top ellipse -->
-  <ellipse cx="64" cy="45" rx="32" ry="12" fill="#f0f0f0" stroke="#ffffff" stroke-width="1"/>
-  <!-- Database cylinder bottom ellipse -->
-  <ellipse cx="64" cy="85" rx="32" ry="12" fill="#e8e8e8"/>
-  <!-- Database lines -->
-  <line x1="32" y1="58" x2="96" y2="58" stroke="#714B67" stroke-width="1.5" opacity="0.3"/>
-  <line x1="32" y1="72" x2="96" y2="72" stroke="#714B67" stroke-width="1.5" opacity="0.3"/>
-  <!-- Restore arrow -->
-  <g transform="translate(64,62)">
-    <path d="M12,-8 A14,14 0 1,0 12,8" fill="none" stroke="#714B67" stroke-width="3.5" stroke-linecap="round"/>
-    <polygon points="12,8 18,4 14,12" fill="#714B67"/>
+  <defs>
+    <linearGradient id="bg" x1="18" y1="14" x2="112" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5e3b5d"/>
+      <stop offset="1" stop-color="#2f6f73"/>
+    </linearGradient>
+    <linearGradient id="diskTop" x1="35" y1="36" x2="93" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff6ea"/>
+      <stop offset="1" stop-color="#f7dcc1"/>
+    </linearGradient>
+    <linearGradient id="diskBody" x1="34" y1="45" x2="94" y2="91" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffdf8"/>
+      <stop offset="1" stop-color="#f1e1cd"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#1f2026" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <circle cx="64" cy="64" r="60" fill="url(#bg)"/>
+  <circle cx="64" cy="64" r="55" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="2"/>
+
+  <g filter="url(#shadow)">
+    <ellipse cx="64" cy="44" rx="30" ry="11" fill="url(#diskTop)"/>
+    <path d="M34 44v34c0 6 13.4 11 30 11s30-5 30-11V44z" fill="url(#diskBody)"/>
+    <ellipse cx="64" cy="78" rx="30" ry="11" fill="#ead3b6"/>
+    <ellipse cx="64" cy="61" rx="30" ry="11" fill="#f6e8d4"/>
+    <ellipse cx="64" cy="44" rx="30" ry="11" fill="none" stroke="#ffffff" stroke-opacity="0.75" stroke-width="2"/>
+    <ellipse cx="64" cy="61" rx="30" ry="11" fill="none" stroke="#8d6b6d" stroke-opacity="0.22" stroke-width="1.5"/>
+    <ellipse cx="64" cy="78" rx="30" ry="11" fill="none" stroke="#8d6b6d" stroke-opacity="0.26" stroke-width="1.5"/>
+  </g>
+
+  <g>
+    <circle cx="88" cy="34" r="18" fill="#f8fbfa" fill-opacity="0.96"/>
+    <circle cx="88" cy="34" r="18" fill="none" stroke="#27595e" stroke-opacity="0.18" stroke-width="2"/>
+    <path
+      d="M88 24v15.2m0 0-6.2-6.2m6.2 6.2 6.2-6.2"
+      fill="none"
+      stroke="#2f6f73"
+      stroke-width="5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M98 35.5a10 10 0 1 1-4.4-8.3"
+      fill="none"
+      stroke="#5e3b5d"
+      stroke-width="3.5"
+      stroke-linecap="round"
+    />
   </g>
 </svg>

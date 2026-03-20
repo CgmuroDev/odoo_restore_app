@@ -3,7 +3,7 @@
 set -euo pipefail
 
 APP_NAME="odoo-restore"
-VERSION="1.0.0"
+VERSION="$(cat "$(dirname "$0")/../VERSION")"
 ARCH="all"
 PKG_DIR="${APP_NAME}_${VERSION}_${ARCH}"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -26,7 +26,7 @@ Section: utils
 Priority: optional
 Architecture: $ARCH
 Depends: python3 (>= 3.10), python3-pyqt6, postgresql-client, rsync
-Maintainer: Soltein <soltein@localhost>
+Maintainer: CgmuroDev <noreply@users.noreply.github.com>
 Description: Restaurar Backup Odoo
  Herramienta grafica para restaurar bases de datos Odoo
  desde respaldos que contengan dump.sql y filestore.
@@ -39,7 +39,10 @@ SRC_DIR="$(dirname "$SCRIPT_DIR")/src"
 # -- Copiar archivos de la app --
 cp "$SRC_DIR/main.py" "$SCRIPT_DIR/$PKG_DIR/opt/odoo-restore/"
 cp "$SRC_DIR/restore_app.py" "$SCRIPT_DIR/$PKG_DIR/opt/odoo-restore/"
+cp "$SRC_DIR/app_meta.py" "$SCRIPT_DIR/$PKG_DIR/opt/odoo-restore/"
+cp "$SRC_DIR/update_service.py" "$SCRIPT_DIR/$PKG_DIR/opt/odoo-restore/"
 cp "$SRC_DIR/icon.svg" "$SCRIPT_DIR/$PKG_DIR/opt/odoo-restore/"
+cp "$(dirname "$SCRIPT_DIR")/VERSION" "$SCRIPT_DIR/$PKG_DIR/opt/odoo-restore/"
 
 # -- Icono al sistema --
 cp "$SRC_DIR/icon.svg" "$SCRIPT_DIR/$PKG_DIR/usr/share/icons/hicolor/scalable/apps/odoo-restore.svg"
