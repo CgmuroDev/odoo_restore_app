@@ -61,6 +61,7 @@ Name=Odoo Restore Manager
 Comment=Restaurar bases de datos Odoo desde respaldos
 Exec=odoo-restore
 Icon=odoo-restore
+StartupWMClass=odoo-restore
 Terminal=false
 Type=Application
 Categories=Utility;Database;System;

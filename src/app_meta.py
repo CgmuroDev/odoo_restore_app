@@ -26,8 +26,20 @@ def _resolve_version_file() -> Path:
 VERSION_FILE = _resolve_version_file()
 
 
+def resolve_icon_file() -> Path:
+    candidates = [
+        MODULE_DIR / "icon.svg",
+        ROOT_DIR / "src" / "icon.svg",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
 def load_version() -> str:
     return VERSION_FILE.read_text(encoding="utf-8").strip()
 
 
 APP_VERSION = load_version()
+APP_ICON_FILE = resolve_icon_file()

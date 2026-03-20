@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 from PyQt6.QtCore import QThread, pyqtSignal, Qt, QTimer, QUrl
-from PyQt6.QtGui import QAction, QDesktopServices, QFont, QIntValidator, QColor
+from PyQt6.QtGui import QDesktopServices, QFont, QIcon, QIntValidator, QColor
 from PyQt6.QtWidgets import (
     QCheckBox,
     QFileDialog,
@@ -32,7 +32,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from app_meta import APP_VERSION
+from app_meta import APP_ICON_FILE, APP_VERSION
 from update_service import (
     fetch_latest_release,
     is_newer_version,
@@ -456,6 +456,7 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Odoo Restore Manager")
+        self.setWindowIcon(QIcon(str(APP_ICON_FILE)))
         self.resize(700, 600)
 
         self._history = HistoryManager()
@@ -469,7 +470,6 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(1200, self._check_updates_on_startup)
 
     def _build_ui(self) -> None:
-        self._build_menu()
         self._tabs.addTab(self._build_restore_tab(), "Restaurar")
         self._tabs.addTab(self._build_history_tab(), "Historial")
         self.setCentralWidget(self._tabs)
@@ -477,12 +477,6 @@ class MainWindow(QMainWindow):
         self._status_bar = QStatusBar()
         self.setStatusBar(self._status_bar)
         self._status_bar.showMessage("Listo")
-
-    def _build_menu(self) -> None:
-        help_menu = self.menuBar().addMenu("Ayuda")
-        check_updates_action = QAction("Buscar actualizaciones", self)
-        check_updates_action.triggered.connect(self._check_updates_manually)
-        help_menu.addAction(check_updates_action)
 
     def _build_restore_tab(self) -> QWidget:
         widget = QWidget()
@@ -698,17 +692,8 @@ class MainWindow(QMainWindow):
     def _check_updates_on_startup(self) -> None:
         self._start_update_check(manual=False)
 
-    def _check_updates_manually(self) -> None:
-        self._start_update_check(manual=True)
-
     def _start_update_check(self, manual: bool) -> None:
         if self._update_worker is not None and self._update_worker.isRunning():
-            if manual:
-                QMessageBox.information(
-                    self,
-                    "Actualizaciones",
-                    "Ya hay una verificacion de actualizaciones en curso.",
-                )
             return
 
         self._update_worker = UpdateCheckWorker(manual=manual)
@@ -729,48 +714,35 @@ class MainWindow(QMainWindow):
         self._update_worker = None
 
         if error:
-            if manual:
-                QMessageBox.warning(self, "Actualizaciones", error)
             return
 
         if release is None:
-            if manual:
-                QMessageBox.information(
-                    self,
-                    "Actualizaciones",
-                    "No se pudo obtener informacion de la ultima release.",
-                )
             return
 
         if not is_newer_version(APP_VERSION, release.version):
-            if manual:
-                QMessageBox.information(
-                    self,
-                    "Actualizaciones",
-                    f"Ya tienes la version mas reciente ({APP_VERSION}).",
-                )
             return
 
         if not release.download_url:
-            if manual:
-                reply = QMessageBox.question(
-                    self,
-                    "Actualizacion disponible",
-                    (
-                        f"Hay una nueva version ({release.version}), pero no hay instalador "
-                        f"para {platform_label()} en la release.\n\n"
-                        "Quieres abrir la pagina de releases?"
-                    ),
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                )
-                if reply == QMessageBox.StandardButton.Yes and release.html_url:
-                    self._open_url(release.html_url)
+            reply = QMessageBox.question(
+                self,
+                "Actualizacion disponible",
+                (
+                    f"Se detecto una nueva version ({release.version}), pero no hay instalador "
+                    f"para {platform_label()} en la release.\n\n"
+                    "Quieres abrir la pagina de releases?"
+                ),
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            )
+            if reply == QMessageBox.StandardButton.Yes and release.html_url:
+                self._open_url(release.html_url)
             return
 
         message = (
+            f"Se detecto una nueva version.\n\n"
             f"Version actual: {APP_VERSION}\n"
             f"Nueva version: {release.version}\n"
             f"Release: {release.release_name}\n\n"
+            "Quieres descargar la actualizacion?\n\n"
             f"{self._release_notes_excerpt(release.release_notes)}"
         )
         dialog = QMessageBox(self)
