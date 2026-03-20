@@ -455,7 +455,7 @@ class UpdateCheckWorker(QThread):
 class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("Restaurar Backup Odoo")
+        self.setWindowTitle("Odoo Restore Manager")
         self.resize(700, 600)
 
         self._history = HistoryManager()

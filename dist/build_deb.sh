@@ -57,7 +57,7 @@ chmod 755 "$SCRIPT_DIR/$PKG_DIR/usr/bin/odoo-restore"
 # -- Desktop entry --
 cat > "$SCRIPT_DIR/$PKG_DIR/usr/share/applications/odoo-restore.desktop" <<'DESKTOP'
 [Desktop Entry]
-Name=Restaurar Backup Odoo
+Name=Odoo Restore Manager
 Comment=Restaurar bases de datos Odoo desde respaldos
 Exec=odoo-restore
 Icon=odoo-restore

@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 APP_SLUG = "odoo-restore"
-APP_DISPLAY_NAME = "OdooRestore"
+APP_DISPLAY_NAME = "Odoo Restore Manager"
 GITHUB_REPO = "CgmuroDev/odoo_restore_app"
 GITHUB_RELEASES_API = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 GITHUB_RELEASES_PAGE = f"https://github.com/{GITHUB_REPO}/releases/latest"
