@@ -25,7 +25,7 @@ Version: $VERSION
 Section: utils
 Priority: optional
 Architecture: $ARCH
-Depends: python3 (>= 3.10), python3-pyqt6, postgresql-client, rsync
+Depends: python3 (>= 3.10), python3-pyqt6, postgresql-client, rsync, policykit-1
 Maintainer: CgmuroDev <noreply@users.noreply.github.com>
 Description: Restaurar Backup Odoo
  Herramienta grafica para restaurar bases de datos Odoo

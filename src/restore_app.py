@@ -9,7 +9,7 @@ from functools import partial
 from datetime import datetime
 from pathlib import Path
 
-from PyQt6.QtCore import QThread, pyqtSignal, Qt, QTimer, QUrl
+from PyQt6.QtCore import QProcess, QThread, pyqtSignal, Qt, QTimer, QUrl
 from PyQt6.QtGui import QDesktopServices, QFont, QIcon, QIntValidator, QColor
 from PyQt6.QtWidgets import (
     QCheckBox,
@@ -21,6 +21,7 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QMainWindow,
     QMessageBox,
+    QProgressDialog,
     QProgressBar,
     QPushButton,
     QStatusBar,
@@ -34,6 +35,8 @@ from PyQt6.QtWidgets import (
 
 from app_meta import APP_ICON_FILE, APP_VERSION
 from update_service import (
+    AppliedUpdate,
+    apply_update,
     fetch_latest_release,
     is_newer_version,
     platform_label,
@@ -447,6 +450,29 @@ class UpdateCheckWorker(QThread):
             self.completed.emit(None, self.manual, str(exc))
 
 
+class UpdateInstallWorker(QThread):
+    progress_changed = pyqtSignal(str, int, int)
+    completed = pyqtSignal(object, str)
+
+    def __init__(self, release: object) -> None:
+        super().__init__()
+        self.release = release
+
+    def run(self) -> None:
+        try:
+            result = apply_update(
+                self.release,
+                system=platform_module.system(),
+                progress_callback=self._emit_progress,
+            )
+            self.completed.emit(result, "")
+        except Exception as exc:
+            self.completed.emit(None, str(exc))
+
+    def _emit_progress(self, message: str, current: int, total: int) -> None:
+        self.progress_changed.emit(message, current, total)
+
+
 # ---------------------------------------------------------------------------
 # MainWindow
 # ---------------------------------------------------------------------------
@@ -462,6 +488,8 @@ class MainWindow(QMainWindow):
         self._history = HistoryManager()
         self._worker: RestoreWorker | None = None
         self._update_worker: UpdateCheckWorker | None = None
+        self._install_worker: UpdateInstallWorker | None = None
+        self._update_progress_dialog: QProgressDialog | None = None
         self._start_time: float = 0
         self._tabs = QTabWidget()
 
@@ -710,6 +738,96 @@ class MainWindow(QMainWindow):
     def _open_url(self, url: str) -> None:
         QDesktopServices.openUrl(QUrl(url))
 
+    def _open_local_path(self, path: Path) -> None:
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
+
+    def _start_update_install(self, release: object) -> None:
+        if self._install_worker is not None and self._install_worker.isRunning():
+            return
+
+        dialog = QProgressDialog("Preparando actualizacion...", "", 0, 0, self)
+        dialog.setWindowTitle("Actualizando")
+        dialog.setCancelButton(None)
+        dialog.setWindowModality(Qt.WindowModality.ApplicationModal)
+        dialog.setAutoClose(False)
+        dialog.setAutoReset(False)
+        dialog.setMinimumDuration(0)
+        dialog.show()
+        self._update_progress_dialog = dialog
+        self._status_bar.showMessage("Preparando actualizacion...")
+
+        self._install_worker = UpdateInstallWorker(release)
+        self._install_worker.progress_changed.connect(self._on_update_install_progress)
+        self._install_worker.completed.connect(self._on_update_install_finished)
+        self._install_worker.start()
+
+    def _on_update_install_progress(self, message: str, current: int, total: int) -> None:
+        self._status_bar.showMessage(message)
+        if self._update_progress_dialog is None:
+            return
+        self._update_progress_dialog.setLabelText(message)
+        if total <= 0:
+            self._update_progress_dialog.setRange(0, 0)
+            return
+        self._update_progress_dialog.setRange(0, total)
+        self._update_progress_dialog.setValue(min(current, total))
+
+    def _restart_after_update(self) -> None:
+        if QProcess.startDetached("odoo-restore"):
+            self.close()
+            return
+        QMessageBox.information(
+            self,
+            "Actualizacion instalada",
+            "La nueva version ya esta instalada. Abre la app de nuevo desde el menu.",
+        )
+        self.close()
+
+    def _finish_update_progress(self) -> None:
+        if self._update_progress_dialog is None:
+            return
+        self._update_progress_dialog.close()
+        self._update_progress_dialog.deleteLater()
+        self._update_progress_dialog = None
+
+    def _on_update_install_finished(self, result: object, error: str) -> None:
+        self._install_worker = None
+        self._finish_update_progress()
+
+        if error:
+            self._status_bar.showMessage("Error al actualizar")
+            QMessageBox.critical(self, "Error de actualizacion", error)
+            return
+
+        if result is None:
+            self._status_bar.showMessage("Actualizacion cancelada")
+            return
+
+        update: AppliedUpdate = result
+        if update.action == "installed":
+            self._status_bar.showMessage("Actualizacion instalada")
+            QMessageBox.information(
+                self,
+                "Actualizacion instalada",
+                "La app se actualizo correctamente y se reiniciara ahora.",
+            )
+            self._restart_after_update()
+            return
+
+        reveal_path = update.extracted_app.parent if update.extracted_app else update.downloaded_file.parent
+        self._open_local_path(reveal_path)
+        self._status_bar.showMessage("Actualizacion preparada")
+        QMessageBox.information(
+            self,
+            "Actualizacion preparada",
+            (
+                f"La nueva version {update.version} ya se descargo.\n\n"
+                f"Zip: {update.downloaded_file}\n"
+                f"App: {update.extracted_app}\n\n"
+                "Se abrira la carpeta para que reemplaces la app actual y la abras de nuevo."
+            ),
+        )
+
     def _on_update_check_finished(self, release: object, manual: bool, error: str) -> None:
         self._update_worker = None
 
@@ -723,18 +841,6 @@ class MainWindow(QMainWindow):
             return
 
         if not release.download_url:
-            reply = QMessageBox.question(
-                self,
-                "Actualizacion disponible",
-                (
-                    f"Se detecto una nueva version ({release.version}), pero no hay instalador "
-                    f"para {platform_label()} en la release.\n\n"
-                    "Quieres abrir la pagina de releases?"
-                ),
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            )
-            if reply == QMessageBox.StandardButton.Yes and release.html_url:
-                self._open_url(release.html_url)
             return
 
         message = (
@@ -742,21 +848,22 @@ class MainWindow(QMainWindow):
             f"Version actual: {APP_VERSION}\n"
             f"Nueva version: {release.version}\n"
             f"Release: {release.release_name}\n\n"
-            "Quieres descargar la actualizacion?\n\n"
+            f"Plataforma: {platform_label()}\n\n"
+            "Quieres actualizar ahora?\n\n"
             f"{self._release_notes_excerpt(release.release_notes)}"
         )
         dialog = QMessageBox(self)
         dialog.setWindowTitle("Actualizacion disponible")
         dialog.setIcon(QMessageBox.Icon.Information)
         dialog.setText(message)
-        download_button = dialog.addButton(
-            "Descargar",
+        update_button = dialog.addButton(
+            "Actualizar ahora",
             QMessageBox.ButtonRole.AcceptRole,
         )
-        dialog.addButton("Cancelar", QMessageBox.ButtonRole.RejectRole)
+        dialog.addButton("Mas tarde", QMessageBox.ButtonRole.RejectRole)
         dialog.exec()
-        if dialog.clickedButton() == download_button:
-            self._open_url(release.download_url)
+        if dialog.clickedButton() == update_button:
+            self._start_update_install(release)
 
     def _on_restore_clicked(self) -> None:
         db_name = self._db_name.text().strip()

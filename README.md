@@ -26,7 +26,7 @@ La herramienta permite:
 Instalacion rapida en Ubuntu/Debian:
 
 ```bash
-sudo apt install python3 python3-pyqt6 postgresql-client rsync
+sudo apt install python3 python3-pyqt6 postgresql-client rsync policykit-1
 ```
 
 ### Python
@@ -110,7 +110,7 @@ Opciones:
 
 - `Copiar filestore`
 - `Eliminar BD si ya existe`
-- `Neutralizar BD (estilo Odoo; requiere rutas de addons)`
+- `Neutralizar base de datos`
 
 ## Actualizaciones
 
@@ -123,8 +123,8 @@ https://github.com/CgmuroDev/odoo_restore_app
 Comportamiento:
 
 - al iniciar la app hace una verificacion silenciosa
-- en `Ayuda > Buscar actualizaciones` puedes forzar una revision manual
-- si hay una version nueva para tu plataforma, la app ofrece abrir la descarga correcta
+- si hay una version nueva para Linux, la app puede descargarla, instalar el `.deb` y reiniciarse
+- si hay una version nueva para macOS, la app descarga el `.zip` y deja la actualizacion preparada
 
 Artefactos esperados por plataforma:
 
@@ -147,6 +147,8 @@ Instalar:
 sudo dpkg -i dist/odoo-restore_<VERSION>_all.deb
 sudo apt install -f
 ```
+
+Para actualizaciones automaticas en Linux, el sistema debe tener `policykit-1` disponible.
 
 ### Windows / macOS / Linux: ejecutable con PyInstaller
 
