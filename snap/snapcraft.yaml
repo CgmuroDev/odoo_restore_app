@@ -1,7 +1,7 @@
 name: odoo-restore
 title: Odoo Restore Manager
 base: core24
-version: '1.0.5'
+version: '1.0.6'
 summary: Restore Odoo backups with dump.sql and filestore support.
 description: |
   Odoo Restore Manager is a desktop application for restoring Odoo backups
