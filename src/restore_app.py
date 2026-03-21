@@ -505,7 +505,7 @@ class MainWindow(QMainWindow):
 
         self._status_bar = QStatusBar()
         self.setStatusBar(self._status_bar)
-        self._status_bar.showMessage("Listo para restaurar respaldos")
+        self._status_bar.showMessage("Listo para restaurar bases Odoo")
 
     def _build_restore_tab(self) -> QWidget:
         widget = QWidget()
