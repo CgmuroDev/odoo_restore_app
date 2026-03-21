@@ -28,3 +28,4 @@ parts/
 prime/
 stage/
 .snapcraft/
+.craft/
