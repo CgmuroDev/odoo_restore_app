@@ -507,6 +507,10 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self._status_bar)
         self._status_bar.showMessage("Listo para restaurar bases Odoo")
 
+        version_label = QLabel(f"v{APP_VERSION}")
+        version_label.setStyleSheet("color: gray; padding-right: 6px;")
+        self._status_bar.addPermanentWidget(version_label)
+
     def _build_restore_tab(self) -> QWidget:
         widget = QWidget()
         layout = QVBoxLayout(widget)
