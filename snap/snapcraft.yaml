@@ -1,0 +1,41 @@
+name: odoo-restore
+title: Odoo Restore Manager
+base: core24
+version: '1.0.5'
+summary: Restore Odoo backups with dump.sql and filestore support.
+description: |
+  Odoo Restore Manager is a desktop application for restoring Odoo backups
+  that contain dump.sql and filestore data.
+
+  It supports PostgreSQL connection settings, optional filestore copy,
+  database neutralization, restoration history, and automatic updates when
+  distributed outside Snap Store.
+
+  Inside Snap, updates are handled by snapd and the in-app GitHub updater is
+  disabled.
+grade: stable
+confinement: classic
+license: MIT
+website: https://github.com/CgmuroDev/odoo_restore_app
+source-code: https://github.com/CgmuroDev/odoo_restore_app
+issues: https://github.com/CgmuroDev/odoo_restore_app/issues
+icon: src/icon.svg
+
+apps:
+  odoo-restore:
+    command: snap/local/launch.sh
+    desktop: snap/gui/odoo-restore.desktop
+    environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      PYTHONPATH: $SNAP/src:$SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3/dist-packages
+
+parts:
+  app:
+    plugin: dump
+    source: .
+    stage-packages:
+      - python3
+      - python3-pyqt6
+      - postgresql-client
+      - rsync

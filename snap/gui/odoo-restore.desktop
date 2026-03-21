@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Odoo Restore Manager
+Comment=Restaurar bases de datos Odoo desde respaldos
+Exec=odoo-restore
+Icon=${SNAP}/src/icon.svg
+StartupWMClass=odoo-restore
+Terminal=false
+Type=Application
+Categories=Utility;Database;System;
+Keywords=odoo;backup;restore;postgresql;database;
